@@ -1,0 +1,69 @@
+/*
+ * Doll coordinate system: a 220 x 560 canvas with the body centered on x = 110.
+ * Most shapes are drawn for the left half only and mirrored to the right.
+ * The head is drawn at 80% around the neck for fashion-illustration proportions.
+ */
+import { f1 } from '../lib/color.ts';
+
+export const HEAD_TRANSFORM = 'translate(110 112) scale(.8) translate(-110 -112)';
+
+/** Draws a left-half shape plus its mirror image on the right. */
+export const mirror = (svg: string): string => svg + `<g transform="translate(220 0) scale(-1 1)">${svg}</g>`;
+
+/** The x position of the body's left edge at height y (shoulder, waist, hip, thigh). */
+export function sideX(y: number): number {
+  if (y <= 150) return 72 + ((y - 132) / 18) * 8;
+  if (y <= 215) return 80 + ((y - 150) / 65) * 8;
+  if (y <= 255) return 88 - ((y - 215) / 40) * 8;
+  return 80 - (y - 255) * 0.12;
+}
+
+/**
+ * A left arm segment from the shoulder down, as a stroked curve with an outline.
+ * t is how far down the arm it goes (0.3 is a short sleeve, 1 is the wrist).
+ * withClasses marks the parts so closet thumbnails can grey them out.
+ */
+export function armSegment(t: number, width: number, fill: string, stroke: string, withClasses = false): string {
+  const P0 = [74, 136];
+  const P1 = [62, 212];
+  const P2 = [60, 292];
+  const c = [P0[0] + (P1[0] - P0[0]) * t, P0[1] + (P1[1] - P0[1]) * t];
+  const e = [
+    (1 - t) * (1 - t) * P0[0] + 2 * t * (1 - t) * P1[0] + t * t * P2[0],
+    (1 - t) * (1 - t) * P0[1] + 2 * t * (1 - t) * P1[1] + t * t * P2[1],
+  ];
+  const d = `M${P0[0]} ${P0[1]} Q${f1(c[0])} ${f1(c[1])} ${f1(e[0])} ${f1(e[1])}`;
+  const [outline, inner] = withClasses ? [' class="ao"', ' class="af"'] : ['', ''];
+  return (
+    `<path${outline} d="${d}" fill="none" stroke="${stroke}" stroke-width="${width + 3}" stroke-linecap="round"/>` +
+    `<path${inner} d="${d}" fill="none" stroke="${fill}" stroke-width="${width}" stroke-linecap="round"/>`
+  );
+}
+
+export type Neckline = 'crew' | 'tank' | 'skin';
+
+/** The torso outline from the neckline down to a hem at height `hem`. */
+export function torsoPath(hem: number, neck: Neckline): string {
+  const startY = neck === 'tank' ? 150 : 132;
+  let d: string;
+  if (neck === 'tank') d = `M${sideX(150)} 150 Q110 168 ${220 - sideX(150)} 150`;
+  else if (neck === 'skin') d = 'M72 132 Q110 120 148 132';
+  else d = 'M72 132 Q86 124 98 124 Q110 133 122 124 Q134 124 148 132';
+  const ys = [150, 215, 255].filter((y) => y > startY && y < hem - 2);
+  ys.forEach((y) => (d += ` L${f1(220 - sideX(y))} ${y}`));
+  d += ` L${f1(220 - sideX(hem))} ${hem} L${f1(sideX(hem))} ${hem}`;
+  [...ys].reverse().forEach((y) => (d += ` L${f1(sideX(y))} ${y}`));
+  return d + ' Z';
+}
+
+/** The left front panel of an open jacket or cardigan, with a V opening down to vY. */
+export function outerHalf(hem: number, vY: number): string {
+  const sx = (y: number) => f1(sideX(y) - 3);
+  const ys = [150, 215, 255].filter((y) => y < hem - 2);
+  let d = `M92 125 L106 ${vY} L106 ${hem} L${sx(hem)} ${hem}`;
+  [...ys].reverse().forEach((y) => (d += ` L${sx(y)} ${y}`));
+  return d + ' L69 132 Q78 125 92 125 Z';
+}
+
+/** The turned-out foot shape every shoe is built on (left foot). */
+export const FOOT_OUTLINE = 'Q85 520 82.6 530 Q79.6 541 81.8 547.6 Q85.6 552.4 91.6 548.6 Q99 541 103.6 529 Q106 519';

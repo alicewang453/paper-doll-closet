@@ -45,6 +45,14 @@ The tests check that every template draws valid coordinates inside the doll at i
 
 Every push to `main` is tested, built and deployed to GitHub Pages by GitHub Actions.
 
+## How I built it
+
+I designed the game and directed its development, and wrote the code with AI assistance (Claude). The main decisions:
+
+- **Draw items from parameters instead of generating images.** Generated clothing images rarely line up with a doll's pose, and each one is fixed once made. Templates always fit, can be recolored and resized instantly, and only need a few structured fields, which keeps the future photo-to-item step simple.
+- **An ink illustration style**, based on fashion illustrations I collected: muted colors, hand-drawn-looking lines and fashion proportions, all done in code so it applies to every item automatically.
+- **Keep the drawing code separate from React**, so the templates and renderer can be tested on their own and reused by a future backend.
+
 ## Tech
 
 React 18 · TypeScript · Vite · Vitest · SVG · GitHub Actions

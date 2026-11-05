@@ -13,6 +13,7 @@ export function makeItem(t: TemplateId, name: string, overrides: Partial<ItemPar
 export const STARTER_AVATAR: Avatar = {
   skin: '#F3CDB0',
   hairStyle: 'long',
+  hairTexture: 'straight',
   hair: '#4A2E22',
   eyes: '#6B4226',
   lips: '#D9707F',

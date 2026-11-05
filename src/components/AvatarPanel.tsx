@@ -1,5 +1,5 @@
-import { EYE_COLORS, HAIR_COLORS, HAIR_STYLES, LIP_COLORS, SKIN_TONES } from '../data/palette.ts';
-import type { Avatar, HairStyle } from '../items/types.ts';
+import { EYE_COLORS, HAIR_COLORS, HAIR_STYLES, HAIR_TEXTURES, LIP_COLORS, SKIN_TONES } from '../data/palette.ts';
+import type { Avatar, HairStyle, HairTexture } from '../items/types.ts';
 import { Swatches } from './Swatches.tsx';
 
 const SKINS = Object.fromEntries(SKIN_TONES.map((c, i) => [`tone ${i + 1}`, c]));
@@ -21,6 +21,22 @@ export function AvatarPanel({ avatar, onChange }: { avatar: Avatar; onChange: (p
               className="chip"
               aria-pressed={avatar.hairStyle === style}
               onClick={() => onChange({ hairStyle: style })}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p className="label">Hair texture</p>
+        <div className="seg">
+          {(Object.entries(HAIR_TEXTURES) as Array<[HairTexture, string]>).map(([texture, label]) => (
+            <button
+              key={texture}
+              type="button"
+              className="chip"
+              aria-pressed={avatar.hairTexture === texture}
+              onClick={() => onChange({ hairTexture: texture })}
             >
               {label}
             </button>

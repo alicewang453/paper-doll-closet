@@ -1,4 +1,4 @@
-import type { HairStyle } from '../items/types.ts';
+import type { HairStyle, HairTexture } from '../items/types.ts';
 
 /** Colors offered in the item editor. */
 export const SWATCHES: Record<string, string> = {
@@ -32,4 +32,6 @@ export const LIP_COLORS: Record<string, string> = {
   rose: '#D9707F', berry: '#C2505F', nude: '#B5655A', pink: '#E89AA4', plum: '#8E3B4E',
 };
 
-export const HAIR_STYLES: Record<HairStyle, string> = { long: 'Long', bob: 'Bob', bun: 'Bun', curly: 'Curly' };
+export const HAIR_STYLES: Record<HairStyle, string> = { short: 'Short', medium: 'Medium', long: 'Long', bun: 'Bun' };
+
+export const HAIR_TEXTURES: Record<HairTexture, string> = { straight: 'Straight', wavy: 'Wavy', curly: 'Curly' };

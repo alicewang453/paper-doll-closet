@@ -74,9 +74,11 @@ describe.each(TEMPLATE_IDS)('%s template', (id) => {
 
 describe('length parameter', () => {
   it('makes skirts, tops, jackets and boots longer as it increases', () => {
-    // Measure only the garment body (the shapes using the main fill), not sleeves.
+    // Measure only the garment body: shapes using the main fill, and only points over the
+    // torso (x 75 to 145), so long sleeves at the sides don't hide the hem moving.
     const mainShapes = (svg: string) => [...svg.matchAll(/<path d="[^"]+" fill="#123456"[^>]*>/g)].map((m) => m[0]).join('');
-    const lowest = (id: keyof typeof TEMPLATES, length: number) => bounds(points(mainShapes(draw(id, length)))).maxY;
+    const overTorso = (pts: Array<[number, number]>) => pts.filter(([x]) => x >= 75 && x <= 145);
+    const lowest = (id: keyof typeof TEMPLATES, length: number) => bounds(overTorso(points(mainShapes(draw(id, length))))).maxY;
     for (const id of ['tee', 'sweater', 'cardigan', 'jacket', 'skirt', 'shorts'] as const) {
       expect(lowest(id, 100)).toBeGreaterThan(lowest(id, 0));
     }

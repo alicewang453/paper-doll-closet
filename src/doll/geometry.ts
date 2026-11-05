@@ -40,6 +40,58 @@ export function armSegment(t: number, width: number, fill: string, stroke: strin
   );
 }
 
+/** A point on the arm's center curve, from the shoulder (s = 0) to the wrist (s = 1). */
+function armPoint(s: number): [number, number] {
+  const P0 = [74, 136], P1 = [62, 212], P2 = [60, 292];
+  const a = (1 - s) * (1 - s), b = 2 * s * (1 - s), c = s * s;
+  return [a * P0[0] + b * P1[0] + c * P2[0], a * P0[1] + b * P1[1] + c * P2[1]];
+}
+
+/** The arm's direction at s, as a unit vector. */
+function armTangent(s: number): [number, number] {
+  const dx = 2 * (1 - s) * (62 - 74) + 2 * s * (60 - 62);
+  const dy = 2 * (1 - s) * (212 - 136) + 2 * s * (292 - 212);
+  const len = Math.hypot(dx, dy);
+  return [dx / len, dy / len];
+}
+
+/**
+ * A left sleeve outline that hugs the arm: half-width `halfTop` at the shoulder, easing
+ * to `halfEnd` at the sleeve's end, which is `t` of the way down the arm (0.3 is a short
+ * sleeve, 1 reaches the wrist). The shoulder is a soft curve about as wide as the arm,
+ * so tops don't look like they have shoulder pads.
+ */
+export function sleevePath(t: number, halfTop: number, halfEnd: number): string {
+  const steps = 10;
+  const outer: string[] = [];
+  const inner: string[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const s = (t * i) / steps;
+    const [x, y] = armPoint(s);
+    const [tx, ty] = armTangent(s);
+    // Ease the width so the sleeve stays close to the arm near the shoulder.
+    const k = i / steps;
+    const half = halfTop + (halfEnd - halfTop) * k * k;
+    // (ty, -tx) points away from the body; (-ty, tx) points toward it.
+    outer.push(`${f1(x + ty * half)} ${f1(y - tx * half)}`);
+    inner.push(`${f1(x - ty * half)} ${f1(y + tx * half)}`);
+  }
+  // Round the shoulder with an arc over the top of the arm, from the inner edge to the outer edge.
+  const [tx, ty] = armTangent(0);
+  const cap: string[] = [];
+  const start = Math.atan2(tx, -ty);
+  for (let i = 1; i < 6; i++) {
+    const angle = start + (Math.PI * i) / 6;
+    const px = Math.cos(angle) * halfTop;
+    const py = Math.sin(angle) * halfTop;
+    // Keep the cap close to the bare shoulder's own curve, so it covers it without bulging up.
+    const along = (px * tx + py * ty) * 0.9;
+    const across = px * ty - py * tx;
+    cap.push(`${f1(74 + along * tx + across * ty)} ${f1(136 + along * ty - across * tx)}`);
+  }
+  return `M${outer.join(' L')} L${[...inner].reverse().join(' L')} L${cap.join(' L')} Z`;
+}
+
 export type Neckline = 'crew' | 'tank' | 'skin';
 
 /** The torso outline from the neckline down to a hem at height `hem`. */

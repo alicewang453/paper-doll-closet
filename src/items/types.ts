@@ -46,11 +46,16 @@ export interface Template {
 
 export type Worn = Partial<Record<Slot, string>>;
 
-export type HairStyle = 'long' | 'bob' | 'bun' | 'curly';
+/** The cut and length of the hair. */
+export type HairStyle = 'short' | 'medium' | 'long' | 'bun';
+
+/** How the hair falls, applied to any style. */
+export type HairTexture = 'straight' | 'wavy' | 'curly';
 
 export interface Avatar {
   skin: string;
   hairStyle: HairStyle;
+  hairTexture: HairTexture;
   hair: string;
   eyes: string;
   lips: string;

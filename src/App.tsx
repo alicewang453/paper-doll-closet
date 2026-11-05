@@ -15,10 +15,21 @@ const MAX_SAVED = 8;
 function loadSaved(): SavedLook[] {
   try {
     const parsed: unknown = JSON.parse(localStorage.getItem(SAVED_KEY) ?? '[]');
-    return Array.isArray(parsed) ? (parsed as SavedLook[]).slice(0, MAX_SAVED) : [];
+    return Array.isArray(parsed)
+      ? (parsed as SavedLook[]).slice(0, MAX_SAVED).map((look) => ({ ...look, avatar: upgradeAvatar(look.avatar) }))
+      : [];
   } catch {
     return [];
   }
+}
+
+/** Converts avatars saved before hair texture existed ('bob' and 'curly' were styles then). */
+function upgradeAvatar(avatar: Avatar): Avatar {
+  const old = avatar.hairStyle as string;
+  if (avatar.hairTexture) return avatar;
+  if (old === 'bob') return { ...avatar, hairStyle: 'short', hairTexture: 'straight' };
+  if (old === 'curly') return { ...avatar, hairStyle: 'medium', hairTexture: 'curly' };
+  return { ...avatar, hairTexture: 'straight' };
 }
 
 const slotOf = (item: Item): Slot => TEMPLATES[item.t].slot;

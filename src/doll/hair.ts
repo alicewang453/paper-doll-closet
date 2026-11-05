@@ -44,10 +44,8 @@ const BACK: Record<HairStyle, Pt[]> = {
 /** The bun itself, drawn as its own small outline above the head. */
 const BUN_KNOT = outline([93, 24], [[[93, 7], [110, 7]], [[127, 7], [127, 24]], [[127, 41], [110, 41]], [[93, 41], [93, 24]]]);
 
-/** Bangs for each style. The bun has hair swept back instead. */
+/** Side-swept bangs, shared by every style (buns included). */
 const BANGS = outline([78, 72], [[[78, 30], [110, 30]], [[142, 30], [142, 72]], [[138, 50], [124, 45]], [[106, 57], [84, 53]], [[80, 61], [78, 72]]]);
-// Covers the whole crown (the face reaches y=30) with a soft hairline lower on the forehead.
-const SWEPT_BACK = outline([77, 72], [[[75, 23], [110, 23]], [[145, 23], [143, 72]], [[140, 52], [126, 46]], [[110, 39], [94, 46]], [[80, 52], [77, 72]]]);
 
 /** Resamples a closed outline so its points are about `spacing` apart. */
 function resample(pts: Pt[], spacing: number): Pt[] {
@@ -209,12 +207,11 @@ export function hairDetails(style: HairStyle, texture: HairTexture, color: strin
 /** The shadow the bangs cast on the forehead. */
 export function bangShadow(style: HairStyle, texture: HairTexture, skin: string): string {
   if (texture === 'curly') return '';
-  const pts = style === 'bun' ? SWEPT_BACK : BANGS;
-  const shape = texture === 'wavy' ? wave(pts, 1.4, 16, 44) : resample(pts, 4);
+  const shape = texture === 'wavy' ? wave(BANGS, 1.4, 16, 44) : resample(BANGS, 4);
   return `<path d="${smoothPath(shape)}" transform="translate(1.5 3.5)" fill="${shade(skin, -0.18)}" opacity=".8"/>`;
 }
 
-/** The hair in front of the face: bangs, or hair swept back for buns. */
+/** The hair in front of the face: the bangs. */
 export function hairFront(style: HairStyle, texture: HairTexture, color: string): string {
   const attrs = `fill="${color}" stroke="${shade(color, -0.3)}" stroke-width="1.3" stroke-linejoin="round"`;
   if (texture === 'curly') {
@@ -227,14 +224,7 @@ export function hairFront(style: HairStyle, texture: HairTexture, color: string)
       `<path d="M86 47 Q110 30 134 47 L134 40 Q110 24 86 40 Z" fill="${color}"/>`
     );
   }
-  const pts = style === 'bun' ? SWEPT_BACK : BANGS;
-  const shape = texture === 'wavy' ? wave(pts, 1.4, 16, 44) : resample(pts, 4);
-  if (style === 'bun') {
-    // Strands pulled up from the hairline toward the bun, with a small shine on the crown.
-    const strands = `<path d="M84 60 Q90 38 106 26 M95 47 Q100 34 109 26 M136 60 Q130 38 114 26 M125 47 Q120 34 111 26" fill="none" stroke="${shade(color, -0.35)}" stroke-width="1" stroke-linecap="round" opacity=".6"/>`;
-    const crownShine = '<path d="M89 46 Q93 36 101 30" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".45"/>';
-    return `<path d="${smoothPath(shape)}" ${attrs}/>${strands}${crownShine}`;
-  }
+  const shape = texture === 'wavy' ? wave(BANGS, 1.4, 16, 44) : resample(BANGS, 4);
   const shine = '<path d="M90 39 Q100 34 112 35 M119 36 Q128 38 133 43" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".55"/>';
   return `<path d="${smoothPath(shape)}" ${attrs}/>${shine}`;
 }

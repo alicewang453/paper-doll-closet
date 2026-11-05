@@ -205,14 +205,14 @@ export function hairDetails(style: HairStyle, texture: HairTexture, color: strin
 }
 
 /** The shadow the bangs cast on the forehead. */
-export function bangShadow(style: HairStyle, texture: HairTexture, skin: string): string {
+export function bangShadow(texture: HairTexture, skin: string): string {
   if (texture === 'curly') return '';
   const shape = texture === 'wavy' ? wave(BANGS, 1.4, 16, 44) : resample(BANGS, 4);
   return `<path d="${smoothPath(shape)}" transform="translate(1.5 3.5)" fill="${shade(skin, -0.18)}" opacity=".8"/>`;
 }
 
 /** The hair in front of the face: the bangs. */
-export function hairFront(style: HairStyle, texture: HairTexture, color: string): string {
+export function hairFront(texture: HairTexture, color: string): string {
   const attrs = `fill="${color}" stroke="${shade(color, -0.3)}" stroke-width="1.3" stroke-linejoin="round"`;
   if (texture === 'curly') {
     // A fringe of curls along the hairline, outlined only on its outer edge.

@@ -3,8 +3,12 @@
  * pattern, length) in doll coordinates, so every variation stays fitted to the body.
  */
 import { f1, shade } from '../lib/color.ts';
-import { FOOT_OUTLINE, armSegment, mirror, outerHalf, sideX, torsoPath } from '../doll/geometry.ts';
-import type { Template, TemplateId } from './types.ts';
+import { FOOT_OUTLINE, mirror, outerHalf, sideX, sleevePath, torsoPath } from '../doll/geometry.ts';
+import type { StyleAttrs, Template, TemplateId } from './types.ts';
+
+/** A fitted left sleeve, drawn behind the torso so the body covers its top. */
+const sleeve = (t: number, halfTop: number, halfEnd: number, F: string, S: string, st: StyleAttrs) =>
+  `<path d="${sleevePath(t, halfTop, halfEnd)}" ${st(F, S)}/>`;
 
 const ELBOW = 'M57 209 Q63 214 71 210 M58 218 Q63 221 70 218';
 const waistband = (color: string, stroke: string, x: number, width: number) =>
@@ -22,7 +26,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
   tee: {
     label: 'Tee', slot: 'top', tab: 'tops', thumb: [36, 108, 148, 150], shape: 'Length',
     def: { color: '#FAFAF5', color2: '#2A3D6E', pattern: 'solid', length: 55 },
-    draw: (p, F, S, st) => mirror(armSegment(0.3, 24, F, S)) + `<path d="${torsoPath(teeHem(p.length), 'crew')}" ${st(F, S)}/>`,
+    draw: (p, F, S, st) => mirror(sleeve(0.3, 9.5, 11.5, F, S, st)) + `<path d="${torsoPath(teeHem(p.length), 'crew')}" ${st(F, S)}/>`,
     folds: (p) => {
       const h = teeHem(p.length);
       return mirror('<path d="M64 168 Q69 173 75 170"/>') +
@@ -34,7 +38,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     def: { color: '#9C9AA6', color2: '#FAFAF5', pattern: 'solid', length: 60 },
     draw: (p, F, S, st) => {
       const h = sweaterHem(p.length);
-      return mirror(armSegment(0.93, 23, F, S)) +
+      return mirror(sleeve(0.93, 9.5, 10, F, S, st)) +
         `<path d="${torsoPath(h, 'crew')}" ${st(F, S)}/>` +
         `<path d="M${f1(sideX(h - 7))} ${h - 7} L${f1(220 - sideX(h - 7))} ${h - 7}" stroke="${S}" stroke-width="1.2"/>` +
         `<path d="M98 124 Q110 133 122 124" fill="none" stroke="${S}" stroke-width="3"/>`;
@@ -63,7 +67,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
       const h = cardiganHem(p.length);
       let buttons = '';
       for (let y = 178; y < h - 6; y += 16) buttons += `<circle cx="102" cy="${y}" r="2.6" fill="${shade(p.color, -0.45)}"/>`;
-      return mirror(armSegment(0.95, 26, F, S)) +
+      return mirror(sleeve(0.95, 10.5, 11, F, S, st)) +
         mirror(`<path d="${outerHalf(h, 170)}" ${st(F, S)}/><path d="M${f1(sideX(h - 6) - 3)} ${h - 6} L106 ${h - 6}" stroke="${S}" stroke-width="1.2"/>`) +
         buttons;
     },
@@ -74,7 +78,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     def: { color: '#C49A6C', color2: '#7A4E2D', pattern: 'solid', length: 50 },
     draw: (p, F, S, st) => {
       const h = jacketHem(p.length);
-      return mirror(armSegment(0.97, 27, F, S)) +
+      return mirror(sleeve(0.97, 11, 11.5, F, S, st)) +
         mirror(
           `<path d="${outerHalf(h, 160)}" ${st(F, S)}/>` +
           `<path d="M92 125 L106 160 L97 167 L80 131 Z" fill="${p.color2}" stroke="${S}" stroke-width="1.3" stroke-linejoin="round"/>` +

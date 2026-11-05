@@ -79,9 +79,9 @@ export function dollSvg(av: Avatar, worn: Worn, items: Item[], opts: DollOptions
   const bodyMask = `${pfx}-bodym`;
   defs += maskDef(pfx, bodyMask, bodySkin('#fff', '#fff'));
   const body = bodySkin(av.skin, skinLine) + overlay(pfx, 'cel', bodyMask);
-  const head = headSkin(av.skin, skinLine) + bangShadow(av.hairStyle, av.hairTexture, av.skin);
+  const head = headSkin(av.skin, skinLine) + bangShadow(av.hairTexture, av.skin);
   const back = hairBack(av.hairStyle, av.hairTexture, av.hair) + hairDetails(av.hairStyle, av.hairTexture, av.hair);
-  const front = hairFront(av.hairStyle, av.hairTexture, av.hair);
+  const front = hairFront(av.hairTexture, av.hair);
   const face = inkFace(av, pfx);
   defs += face.defs;
 
